@@ -12,11 +12,11 @@ SessionLocal = sessionmaker(bind=engine, autoflush=False, autocommit=False)
 class Base(DeclarativeBase):
     """Declarative base for all ORM models."""
 
-    def get_db():
-        """Yield a database session and quarantee it is closed aftewards"""
+def get_db():
+    """Yield a database session and quarantee it is closed aftewards"""
 
-        db = SessionLocal()
-        try:
-            yield db
-        finally:
-            db.close
+    db = SessionLocal()
+    try:
+        yield db
+    finally:
+        db.close

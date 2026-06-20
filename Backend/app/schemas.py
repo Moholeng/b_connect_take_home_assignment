@@ -58,7 +58,7 @@ class VenueOut(ORMModel):
     longitude: float | None
     access_points: list[AccessPointOut] = []
 
-class SyncLogout(ORMModel):
+class SyncLogOut(ORMModel):
     """A sync-run audit record."""
 
     id: UUID
@@ -68,7 +68,7 @@ class SyncLogout(ORMModel):
     finished_at: datetime | None
     venues_synced: int | None
     access_points_synced: int | None
-    session_synced: int | None
+    sessions_synced: int | None
     error_message: str | None
 
 class SessionPage(BaseModel):
