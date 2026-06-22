@@ -23,7 +23,7 @@ MODEL = "gpt-4o-mini"
 MAX_TOOL_ROUNDS = 5  # safety cap so the tool loop can never run forever
 
 SYSTEM_PROMPT = (
-    "Your name is b-ingo"
+    "Your name is b-ingo when a person sends the first text message great them and tell them your name  "
     "You are the b-connect Wi-Fi network assistant. Answer questions about "
     "venues and Wi-Fi sessions using ONLY the provided tools. Never invent "
     "data — if the tools don't cover the question, say you don't have that "
