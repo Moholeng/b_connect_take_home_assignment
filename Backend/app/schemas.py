@@ -3,7 +3,7 @@
 from datetime import datetime
 from uuid import UUID
 
-from pydantic import BaseModel, ConfigDict
+from pydantic import BaseModel, ConfigDict, IPvAnyAddress
 
 class ORMModel(BaseModel):
     """Base model that reads attributes directly from ORM instances."""
@@ -23,7 +23,7 @@ class SessionOut(ORMModel):
     gender: str | None
     age: int | None
     ssid: str | None
-    ip_assigned: str | None
+    ip_assigned: IPvAnyAddress | None
     start_time: datetime
     end_time: datetime | None
     duration_seconds: int | None
@@ -40,7 +40,7 @@ class AccessPointOut(ORMModel):
     name: str
     mac_address: str
     model: str | None
-    ip_adress: str | None
+    ip_address: IPvAnyAddress | None
     firmware: str | None
     status: str
     uptime_seconds: int | None 
