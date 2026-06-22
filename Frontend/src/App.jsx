@@ -1,4 +1,4 @@
-import { useEffect, useState, useCallback } from "react";
+import { useEffect, useState, useCallback, Fragment } from "react";
 import Chat from "./Chat";
 import {
   getSyncStatus,
@@ -83,6 +83,7 @@ export default function App() {
   const [loading, setLoading] = useState(true); // initial page load
   const [syncing, setSyncing] = useState(false); // POST /sync in flight
   const [error, setError] = useState(null); // backend unreachable / failed
+  const [expandedVenue, setExpandedVenue] = useState(null); // venue id currently expanded
 
   // AI insights state
   const [insights, setInsights] = useState(null);
@@ -226,10 +227,7 @@ export default function App() {
               </div>
             </Section>
 
-            {/* Interactive chat agent */}
-            <Chat />
-
-            {/* Venues */}
+            {/* Venues — click a row to reveal its access points */}
             <Section title="Venues" count={venues.length}>
               {venues.length === 0 ? (
                 <p className="px-4 py-6 text-sm text-gray-500">No venues found.</p>
@@ -237,6 +235,7 @@ export default function App() {
                 <table className="min-w-full text-sm">
                   <thead className="bg-gray-50 text-left text-xs uppercase tracking-wide text-gray-500">
                     <tr>
+                      <th className="w-8 px-4 py-2"></th>
                       <th className="px-4 py-2">Name</th>
                       <th className="px-4 py-2">City</th>
                       <th className="px-4 py-2">Country</th>
@@ -244,16 +243,64 @@ export default function App() {
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-gray-100">
-                    {venues.map((v) => (
-                      <tr key={v.id} className="hover:bg-gray-50">
-                        <td className="px-4 py-2 font-medium">{v.name}</td>
-                        <td className="px-4 py-2 text-gray-600">{v.city ?? "—"}</td>
-                        <td className="px-4 py-2 text-gray-600">{v.country ?? "—"}</td>
-                        <td className="px-4 py-2 text-gray-600">
-                          {v.access_points?.length ?? 0}
-                        </td>
-                      </tr>
-                    ))}
+                    {venues.map((v) => {
+                      const isOpen = expandedVenue === v.id;
+                      return (
+                        <Fragment key={v.id}>
+                          <tr
+                            onClick={() => setExpandedVenue(isOpen ? null : v.id)}
+                            className="cursor-pointer hover:bg-gray-50"
+                          >
+                            <td className="px-4 py-2 text-gray-400">
+                              {isOpen ? "▾" : "▸"}
+                            </td>
+                            <td className="px-4 py-2 font-medium">{v.name}</td>
+                            <td className="px-4 py-2 text-gray-600">{v.city ?? "—"}</td>
+                            <td className="px-4 py-2 text-gray-600">
+                              {v.country ?? "—"}
+                            </td>
+                            <td className="px-4 py-2 text-gray-600">
+                              {v.access_points?.length ?? 0}
+                            </td>
+                          </tr>
+
+                          {isOpen && (
+                            <tr className="bg-gray-50">
+                              <td colSpan={5} className="px-4 py-3">
+                                {v.access_points?.length ? (
+                                  <div className="space-y-2">
+                                    {v.access_points.map((ap) => (
+                                      <div
+                                        key={ap.id}
+                                        className="flex flex-wrap items-center gap-x-4 gap-y-1 rounded-md border border-gray-200 bg-white px-3 py-2 text-xs"
+                                      >
+                                        <span className="font-medium text-gray-800">
+                                          {ap.name}
+                                        </span>
+                                        <StatusPill status={ap.status} />
+                                        <span className="font-mono text-gray-500">
+                                          {ap.mac_address}
+                                        </span>
+                                        <span className="text-gray-500">
+                                          {ap.model ?? "—"}
+                                        </span>
+                                        <span className="text-gray-400">
+                                          {ap.ip_address ?? "no IP"}
+                                        </span>
+                                      </div>
+                                    ))}
+                                  </div>
+                                ) : (
+                                  <p className="text-xs text-gray-500">
+                                    No access points for this venue.
+                                  </p>
+                                )}
+                              </td>
+                            </tr>
+                          )}
+                        </Fragment>
+                      );
+                    })}
                   </tbody>
                 </table>
               )}
@@ -298,6 +345,8 @@ export default function App() {
           </div>
         )}
       </div>
+
+      <Chat />   {/* floating bubble, fixed bottom-right */}
     </div>
   );
 }
