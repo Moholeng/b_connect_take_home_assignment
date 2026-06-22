@@ -8,6 +8,7 @@ class Settings(BaseSettings):
 
     database_url: str
     frontend_origin: str = "http://localhost:5173"
+    openai_api_key: str | None = None 
 
     model_config = SettingsConfigDict(env_file=".env", extra="ignore")
 

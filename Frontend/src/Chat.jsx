@@ -56,7 +56,7 @@ export default function Chat() {
     }
   }
 
-  // Optional: clear both the UI and the persisted history.
+  // Clear both the UI and the persisted history.
   function clearHistory() {
     setMessages([]);
   }

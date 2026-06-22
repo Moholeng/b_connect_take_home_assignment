@@ -1,9 +1,11 @@
 import { useEffect, useState, useCallback } from "react";
+import Chat from "./Chat";
 import {
   getSyncStatus,
   getVenues,
   getSessions,
   triggerSync,
+  getInsights,
 } from "./api";
 
 // ── Small reusable bits ──────────────────────────────────────────────
@@ -82,6 +84,11 @@ export default function App() {
   const [syncing, setSyncing] = useState(false); // POST /sync in flight
   const [error, setError] = useState(null); // backend unreachable / failed
 
+  // AI insights state
+  const [insights, setInsights] = useState(null);
+  const [insightsLoading, setInsightsLoading] = useState(false);
+  const [insightsError, setInsightsError] = useState(null);
+
   // Fetches all three datasets in parallel. Reused by the initial mount
   // effect and by the Sync button's post-success refresh.
   const loadAll = useCallback(async () => {
@@ -100,6 +107,20 @@ export default function App() {
       setError(err.message || "Could not reach the backend.");
     }
   }, []);
+
+  // GET /insights handler: spinner, fetch, display or error.
+  async function generateInsights() {
+    setInsightsLoading(true);
+    setInsightsError(null);
+    try {
+      const data = await getInsights();
+      setInsights(data.insights);
+    } catch (err) {
+      setInsightsError(err.message || "Could not generate insights.");
+    } finally {
+      setInsightsLoading(false);
+    }
+  }
 
   // Initial fetch on mount.
   useEffect(() => {
@@ -179,6 +200,35 @@ export default function App() {
           </div>
         ) : (
           <div className="grid grid-cols-1 gap-6">
+            {/* AI Network Insights */}
+            <Section title="AI Network Insights">
+              <div className="space-y-3 px-4 py-4">
+                <button
+                  onClick={generateInsights}
+                  disabled={insightsLoading}
+                  className="inline-flex items-center gap-2 rounded-md bg-indigo-600 px-4 py-2 text-sm font-medium text-white transition hover:bg-indigo-700 disabled:cursor-not-allowed disabled:opacity-60"
+                >
+                  {insightsLoading && <Spinner />}
+                  {insightsLoading ? "Analyzing…" : "Generate Insights"}
+                </button>
+
+                {insightsError && (
+                  <div className="rounded-md border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
+                    {insightsError}
+                  </div>
+                )}
+
+                {insights && !insightsError && (
+                  <div className="whitespace-pre-line rounded-md border border-gray-200 bg-gray-50 px-4 py-3 text-sm text-gray-800">
+                    {insights}
+                  </div>
+                )}
+              </div>
+            </Section>
+
+            {/* Interactive chat agent */}
+            <Chat />
+
             {/* Venues */}
             <Section title="Venues" count={venues.length}>
               {venues.length === 0 ? (

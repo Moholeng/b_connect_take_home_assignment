@@ -46,3 +46,16 @@ export async function getSessions({ limit = 50 } = {}) {
 export function triggerSync() {
   return request("/sync", { method: "POST" });
 }
+
+// GET /insights -> { insights: string, model: string }
+export function getInsights() {
+  return request("/insights");
+}
+
+// POST /chat -> { reply: string }
+export function sendChatMessage(message) {
+  return request("/chat", {
+    method: "POST",
+    body: JSON.stringify({ message }),
+  });
+}
